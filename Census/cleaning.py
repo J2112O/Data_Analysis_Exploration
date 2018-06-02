@@ -1,9 +1,43 @@
 #!/usr/bin/python3.6
 import csv
+import dateutil.parser
+
+# Borrowed and trying these from Data Science Book I had
+
+
+def parse_rows_with(reader, parsers):
+    """wrap a reader to apply the parsers to each of its rows"""
+    for row in reader:
+        yield parse_row(row, parsers)
+
+
+def try_or_none(f):
+    """wraps f t return None if f raises an exception assumes f takes only one iput"""
+    def f_or_none(x):
+        try:
+            return f(x)
+        except:
+            return None
+    return f_or_none
+
+
+def parse_row(input_row, parsers):
+    return [try_or_none(parser)(value) if parser is not None else value for value, parser in zip(input_row, parsers)]
 
 
 def cleanup():
+    data = []
+    with open("trial.csv", "r") as f:
+        reader = csv.reader(f)
+        #header = next(reader)
+        for line in parse_rows_with(reader, [dateutil.parser.parse, None, float]):
+            data.append(line)
+    # print(header)
+    for row in data:
+        if any(x is None for x in row):
+            print(row)
 
+    '''
     file = ('acs2015_county_data.csv')
     with open(file, newline='') as csv_file:
         csv_reader = csv.reader(csv_file)
@@ -50,7 +84,7 @@ def cleanup():
 
             data_set.append([census_id, state, county, total_pop, men, women, hispanic, white, black, native, asian, pacific, citizen, income, income_err, income_per_cap, income_per_cap_err, poverty, child_poverty, profession, service, office, construction, production, drive, carpool, transit, walk, other_transp, work_at_home, mean_commute, employed, private_work, public_work, self_employed, family_work, unemployment])
 
-        '''Saving the work so far until I can get a look at the three columns'''
+        Saving the work so far until I can get a look at the three columns
         semi_clean_file = ('semi_clean_file.csv')
         file = open(semi_clean_file, 'w')
         writer = csv.writer(file)
@@ -74,6 +108,7 @@ def explore_a_csv(some_file):
         data = [row for row in csv_reader]
         print(header)  # Printing the column names.
         print(data[0])  # Printing the first row of data.
+'''
 
 
 if __name__ == '__main__':
